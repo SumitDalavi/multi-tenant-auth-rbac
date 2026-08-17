@@ -1,0 +1,15 @@
+{
+  "name": "multi-tenant-auth-rbac",
+  "version": "1.0.0",
+  "description": "Multi-Tenant Auth & RBAC with NestJS and Postgres RLS",
+  "main": "dist/main.js",
+  "scripts": {
+    "start": "nest start"
+  },
+  "dependencies": {
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/core": "^10.0.0",
+    "pg": "^8.11.3",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
