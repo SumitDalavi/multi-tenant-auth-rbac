@@ -45,4 +45,11 @@ describe('AppController (e2e)', () => {
       .expect(200)
       .expect([{ id: 1, data: 'tenant1_data' }]);
   });
+
+  it('/data (GET) - Unauthorized with invalid token', () => {
+    return request(app.getHttpServer())
+      .get('/data')
+      .set('Authorization', `Bearer invalid-token`)
+      .expect(403);
+  });
 });
