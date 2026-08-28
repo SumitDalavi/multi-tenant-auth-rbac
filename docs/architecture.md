@@ -7,13 +7,13 @@ The following Mermaid.js sequence diagram maps the core workflow and interaction
 sequenceDiagram
     client->>API: Request + JWT
 API->>Middleware: Extract TenantID
-API->>Postgres: SET LOCAL app.tenant_id
-Postgres->>API: RLS filtered rows
+API->>SQLite: SET LOCAL app.tenant_id
+SQLite->>API: RLS filtered rows
 API-->>client: Data
 ```
 
 ## Component Breakdown
-- **Core Technology**: NestJS, Postgres RLS
+- **Core Technology**: NestJS, SQLite RLS
 - **Design Paradigm**: Emphasizes high availability, fault tolerance, and security.
 
 ## Security & Scaling Considerations

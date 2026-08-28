@@ -1,9 +1,16 @@
-import { NestFactory } from '@nestjs/core';
-import { Module, Controller, Get, Req, UseGuards, Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { NestFactory, Reflector } from '@nestjs/core';
+import { Module, Controller, Get, Post, Delete, Req, UseGuards, Injectable, CanActivate, ExecutionContext, SetMetadata } from '@nestjs/common';
 import { Pool } from 'pg';
 import * as jwt from 'jsonwebtoken';
+import { trace, context } from '@opentelemetry/api';
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL || 'postgres://user:pass@localhost:5432/db' });
+
+// Setup OpenTelemetry Tracer
+const tracer = trace.getTracer('multi-tenant-auth-rbac');
+
+// Roles Decorator
+export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
 
 // Setup Row-Level Security on Postgres Connections
 @Injectable()
@@ -22,22 +29,76 @@ export class TenantGuard implements CanActivate {
   }
 }
 
+// RBAC Guard
+@Injectable()
+export class RolesGuard implements CanActivate {
+  constructor(private reflector: Reflector) {}
+
+  canActivate(context: ExecutionContext): boolean {
+    const requiredRoles = this.reflector.get<string[]>('roles', context.getHandler());
+    if (!requiredRoles) {
+      return true;
+    }
+    const request = context.switchToHttp().getRequest();
+    const userRole = request.role;
+    return requiredRoles.includes(userRole);
+  }
+}
+
 @Controller('data')
+@UseGuards(TenantGuard, RolesGuard)
 export class DataController {
   @Get()
-  @UseGuards(TenantGuard)
+  @Roles('admin', 'viewer')
   async getData(@Req() req) {
-    const client = await pool.connect();
-    try {
-      // Enforce RLS at the database connection level!
-      await client.query(`SET LOCAL app.current_tenant_id = '${req.tenantId}'`);
-      
-      // Query executes under strict RLS isolation
-      const res = await client.query('SELECT * FROM tenant_data');
-      return res.rows;
-    } finally {
-      client.release();
-    }
+    return tracer.startActiveSpan('getData', async (span) => {
+      const client = await pool.connect();
+      try {
+        await client.query(`SET LOCAL app.current_tenant_id = '${req.tenantId}'`);
+        const res = await client.query('SELECT * FROM tenant_data');
+        span.setAttribute('tenant.id', req.tenantId);
+        span.setAttribute('db.rows', res.rowCount);
+        return res.rows;
+      } finally {
+        client.release();
+        span.end();
+      }
+    });
+  }
+
+  @Post()
+  @Roles('admin')
+  async addData(@Req() req) {
+    return tracer.startActiveSpan('addData', async (span) => {
+      const client = await pool.connect();
+      try {
+        await client.query(`SET LOCAL app.current_tenant_id = '${req.tenantId}'`);
+        const res = await client.query('INSERT INTO tenant_data (tenant_id, data) VALUES ($1, $2) RETURNING *', [req.tenantId, req.body?.data || 'new_data']);
+        span.setAttribute('tenant.id', req.tenantId);
+        return res.rows[0];
+      } finally {
+        client.release();
+        span.end();
+      }
+    });
+  }
+
+  @Delete()
+  @Roles('admin')
+  async deleteData(@Req() req) {
+    return tracer.startActiveSpan('deleteData', async (span) => {
+      const client = await pool.connect();
+      try {
+        await client.query(`SET LOCAL app.current_tenant_id = '${req.tenantId}'`);
+        // RLS prevents deleting other tenants' data even without WHERE tenant_id=...
+        const res = await client.query('DELETE FROM tenant_data RETURNING *');
+        span.setAttribute('tenant.id', req.tenantId);
+        return res.rows;
+      } finally {
+        client.release();
+        span.end();
+      }
+    });
   }
 }
 
