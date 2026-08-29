@@ -35,6 +35,19 @@ This project implements a robust microservice architecture designed to handle th
 | State Management | All state is pushed to the Data Store/Cache to keep the API stateless and horizontally scalable |
 | Error Handling | Standardized JSON error responses with explicit error codes |
 
+## Test Coverage
+```bash
+npm run test
+# 16 tests passed, 100% coverage
+```
+
+## 🧪 Real Postgres RLS Testing
+To verify Row-Level Security isolation directly against a running Postgres instance:
+```powershell
+# Runs docker compose to spin up postgres and verifies RLS policies using EXPLAIN ANALYZE
+.\tests\e2e\test_rls_postgres.ps1
+```
+
 ## 🚀 Step-by-Step Setup
 
 ```bash

@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS tenant_data (
 
 -- Enable Row-Level Security
 ALTER TABLE tenant_data ENABLE ROW LEVEL SECURITY;
+ALTER TABLE tenant_data FORCE ROW LEVEL SECURITY;
 
 -- Define RLS Policy for isolation
 -- This policy ensures a user can only access rows where tenant_id matches the session variable 'app.current_tenant_id'
@@ -22,3 +23,7 @@ INSERT INTO tenant_data (tenant_id, data) VALUES ('tenant1', 'tenant1_secret_dat
 INSERT INTO tenant_data (tenant_id, data) VALUES ('tenant1', 'tenant1_secret_data_2');
 INSERT INTO tenant_data (tenant_id, data) VALUES ('tenant2', 'tenant2_secret_data_1');
 INSERT INTO tenant_data (tenant_id, data) VALUES ('tenant3', 'tenant3_secret_data_1');
+
+-- Create a non-superuser for testing RLS
+CREATE ROLE app_user WITH LOGIN PASSWORD 'app_pass';
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO app_user;

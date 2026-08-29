@@ -29,3 +29,18 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build Docker Image
         run: docker build -t test-image .
+  rls-integration-test:
+    name: PostgreSQL RLS Isolation Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run RLS Isolation Test (proves tenant isolation with EXPLAIN ANALYZE)
+        run: |
+          chmod +x tests/e2e/test_rls_postgres.sh
+          bash tests/e2e/test_rls_postgres.sh
+      - name: Upload EXPLAIN ANALYZE output (RLS proof)
+        uses: actions/upload-artifact@v4
+        with:
+          name: rls-explain-output
+          path: explain_output.txt
+          retention-days: 90
