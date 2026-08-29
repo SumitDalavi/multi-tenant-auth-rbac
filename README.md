@@ -3,6 +3,8 @@
 
 # Multi-Tenant Auth & RBAC 🔐
 
+[![CI](https://github.com/SumitDalavi/multi-tenant-auth-rbac/actions/workflows/ci.yml/badge.svg)](https://github.com/SumitDalavi/multi-tenant-auth-rbac/actions/workflows/ci.yml)
+
 > **Maturity:** Functional Prototype
 > _B2B multi-tenant authentication engine leveraging PostgreSQL Row-Level Security (RLS) for absolute data isolation._
 
