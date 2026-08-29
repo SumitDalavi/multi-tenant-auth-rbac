@@ -1,22 +1,28 @@
-# multi-tenant-auth-rbac Architecture
+# Architecture — multi-tenant-auth-rbac
+> Last updated: 2026-08-29 | Maturity: Partial Prototype
+> _Multi-tenant isolation using PostgreSQL RLS._
 
 ## System Diagram
-The following Mermaid.js sequence diagram maps the core workflow and interactions:
-
 ```mermaid
-sequenceDiagram
-    client->>API: Request + JWT
-API->>Middleware: Extract TenantID
-API->>SQLite: SET LOCAL app.tenant_id
-SQLite->>API: RLS filtered rows
-API-->>client: Data
+flowchart TD
+    Client(["API Client\n(JWT: tenant_a)"])
+    API["Auth API\n:8080"]
+    PG[("Postgres :5432\n(RLS enabled)")]
+    
+    Client -->|"GET /api/documents"| API
+    API -->|"SET LOCAL current_tenant_id = 'tenant_a'"| PG
+    API -->|"SELECT * FROM documents"| PG
+    PG -->|"Only tenant_a docs returned"| API
+    API --> Client
 ```
 
-## Component Breakdown
-- **Core Technology**: NestJS, SQLite RLS
-- **Design Paradigm**: Emphasizes high availability, fault tolerance, and security.
+## Component Table
+| Component | File | Responsibility | Tech |
+|---|---|---|---|
+| API Server | `src/server.ts` | REST endpoints, JWT validation | Express.js |
+| DB Schema | `schema.sql` | RLS definitions and tables | PostgreSQL |
 
-## Security & Scaling Considerations
-- Strict boundary validations.
-- Horizontal scalability achieved via stateless workers.
-- Encrypted data at rest and in transit.
+## Dependency Honesty Table
+| Dependency | Status | Notes |
+|---|---|---|
+| PostgreSQL | **Real** | Postgres 16 required to enforce Row-Level Security policies. |
