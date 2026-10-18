@@ -3,6 +3,9 @@
 
 # Multi-Tenant Auth & RBAC 🔐
 
+[![Release](https://img.shields.io/github/v/release/SumitDalavi/multi-tenant-auth-rbac?color=blue&logo=github)](https://github.com/SumitDalavi/multi-tenant-auth-rbac/releases)
+[![SBOM](https://img.shields.io/badge/SBOM-SPDX%20JSON-blueviolet?logo=spdx)](https://github.com/SumitDalavi/multi-tenant-auth-rbac/releases)
+
 [![CI](https://github.com/SumitDalavi/multi-tenant-auth-rbac/actions/workflows/ci.yml/badge.svg)](https://github.com/SumitDalavi/multi-tenant-auth-rbac/actions/workflows/ci.yml)
 
 > **Maturity:** Functional Prototype
@@ -110,3 +113,24 @@ curl -X POST http://localhost:8080/api/trigger -H "Content-Type: application/jso
 
 ## Known Limitations
 - **Database Testing**: Tests use a stateful mocked PostgreSQL instance, which differs from real PostgreSQL Row-Level Security (RLS) verification.
+
+## Release & Verification
+
+The project includes an automated DevSecOps release pipeline (`.github/workflows/release.yml`) triggered on semantic version tags (`v*.*.*`).
+
+Each release automatically:
+1. Executes test suite gates.
+2. Builds the container image.
+3. Performs vulnerability scanning via Trivy.
+4. Generates an SPDX SBOM (`sbom.spdx.json`) using Anchore Syft.
+5. Publishes a GitHub Release with attached SBOM.
+
+### Verifying the Release
+```bash
+# Verify release via GitHub CLI
+gh release view v0.1.0 --repo SumitDalavi/multi-tenant-auth-rbac
+
+# Download and inspect SBOM
+gh release download v0.1.0 --repo SumitDalavi/multi-tenant-auth-rbac --pattern "sbom.spdx.json"
+cat sbom.spdx.json | jq .
+```
