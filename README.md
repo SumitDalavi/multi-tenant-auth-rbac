@@ -4,6 +4,10 @@
 # Multi-Tenant Auth & RBAC 🔐
 
 [![Release](https://img.shields.io/github/v/release/SumitDalavi/multi-tenant-auth-rbac?color=blue&logo=github)](https://github.com/SumitDalavi/multi-tenant-auth-rbac/releases)
+[![Release Workflow](https://github.com/SumitDalavi/multi-tenant-auth-rbac/actions/workflows/release.yml/badge.svg)](https://github.com/SumitDalavi/multi-tenant-auth-rbac/actions/workflows/release.yml)
+[![SBOM](https://img.shields.io/badge/SBOM-SPDX%20JSON-blueviolet?logo=spdx)](https://github.com/SumitDalavi/multi-tenant-auth-rbac/releases)
+
+[![Release](https://img.shields.io/github/v/release/SumitDalavi/multi-tenant-auth-rbac?color=blue&logo=github)](https://github.com/SumitDalavi/multi-tenant-auth-rbac/releases)
 [![SBOM](https://img.shields.io/badge/SBOM-SPDX%20JSON-blueviolet?logo=spdx)](https://github.com/SumitDalavi/multi-tenant-auth-rbac/releases)
 
 [![CI](https://github.com/SumitDalavi/multi-tenant-auth-rbac/actions/workflows/ci.yml/badge.svg)](https://github.com/SumitDalavi/multi-tenant-auth-rbac/actions/workflows/ci.yml)
@@ -114,7 +118,7 @@ curl -X POST http://localhost:8080/api/trigger -H "Content-Type: application/jso
 ## Known Limitations
 - **Database Testing**: Tests use a stateful mocked PostgreSQL instance, which differs from real PostgreSQL Row-Level Security (RLS) verification.
 
-## Release & Verification
+## Release & Security Verification
 
 The project includes an automated DevSecOps release pipeline (`.github/workflows/release.yml`) triggered on semantic version tags (`v*.*.*`).
 
@@ -134,3 +138,10 @@ gh release view v0.1.0 --repo SumitDalavi/multi-tenant-auth-rbac
 gh release download v0.1.0 --repo SumitDalavi/multi-tenant-auth-rbac --pattern "sbom.spdx.json"
 cat sbom.spdx.json | jq .
 ```
+
+## Documentation
+
+- [Architecture](docs/ARCHITECTURE.md)
+- [Runbook](docs/runbook.md)
+- [Decisions](docs/decisions.md)
+- [Changelog](docs/changelog.md)
