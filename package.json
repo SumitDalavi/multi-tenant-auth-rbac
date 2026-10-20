@@ -1,6 +1,6 @@
 {
   "name": "multi-tenant-auth-rbac",
-  "version": "1.0.0",
+  "version": "0.2.0",
   "description": "Multi-Tenant Auth & RBAC with NestJS and Postgres RLS",
   "main": "dist/main.js",
   "scripts": {
