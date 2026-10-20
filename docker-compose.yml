@@ -1,16 +1,20 @@
 version: '3.8'
+
 services:
   api:
     build: .
     ports:
       - "3000:3000"
+    env_file:
+      - path: .env
+        required: false
     environment:
-      - DATABASE_URL=postgres://user:pass@db:5432/db
-    depends_on:
-      - db
-  
+      - PORT=3000
+
+  # ── Tier 2 Companion Services (started via: docker compose --profile live up) ──
   db:
     image: postgres:15-alpine
+    profiles: ["live"]
     environment:
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=pass
@@ -18,4 +22,17 @@ services:
     ports:
       - "5432:5432"
     volumes:
+      - pgdata:/var/lib/postgresql/data
       - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+  redis:
+    image: redis:7-alpine
+    profiles: ["live"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+
+volumes:
+  pgdata:
+  redisdata:
