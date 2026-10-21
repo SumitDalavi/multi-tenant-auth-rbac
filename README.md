@@ -11,14 +11,10 @@
 > B2B multi-tenant authentication engine leveraging PostgreSQL Row-Level Security (RLS) for absolute data isolation.
 
 ## The Problem
-## Problem Statement
-B2B SaaS platforms require strict data isolation between tenants, and building this application-side is error-prone.
+B2B SaaS platforms require strict data isolation between tenants, and enforcing this purely in application code is error-prone and vulnerable to developer oversight.
 
 ## Architecture & Solution
-A localized SQLite policy decision point, drastically simplifying deployment while maintaining absolute tenant boundaries. Simple CRUD applications fail when subjected to high throughput, race conditions, or massive data sets.
-
-## The Solution
-This project implements a robust microservice architecture designed to handle these specific edge cases. By utilizing advanced paradigms like idempotency keys, advisory locks, or optimized caching layers, this service guarantees data integrity under load.
+This project implements a multi-tenant authentication engine leveraging PostgreSQL Row-Level Security (RLS) and localized policy evaluation, guaranteeing absolute tenant isolation at the data tier without cross-tenant leakage.
 
 ```text
 ┌──────────────┐      ┌───────────────┐      ┌───────────────┐
